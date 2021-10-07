@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>周报填写</title>
+    <link rel="stylesheet" href="./layui.css">
+    <style>
+        .layui-text ul li{
+            list-style: none;
+        }
+        textarea{
+            width: 100%;
+            height: 100px;
+        }
+        input{
+            width: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="layui-container">
+    <div style="text-align: right;color:blue;"><a href="/clear" style="cursor:pointer">》》清空重写</a></div>
+    <div class="layui-progress" >
+        <div class="layui-progress-bar" lay-percent="100%"></div>
+    </div>
+
+    <blockquote class="layui-elem-quote" style="border-right: 5px solid #5fb878;">
+        <div class="layui-text">
+            <ul>
+                <li style="text-align: center;margin-bottom:30px;"><h2>周报</h2><a href="/download">生成周报</a></li>
+                <li>
+                    <span><input id="sm" value=""/>月<input id="sd"/>日</span>——<span><input id="em" />月<input id="ed"/>日</span><span style="margin-left:80px;text-align: right">本周测试功能点：<input id="gs"></input>个</span>
+                    <div class="layui-btn-container" style="text-align: right;">
+                        <button class="layui-btn" onclick="subdate();">提交</button>
+                    </div>
+                </li>
+                <li>
+                    <div class="layui-progress" style="margin: 15px 0 30px;">
+                        <div class="layui-progress-bar" lay-percent="100%"></div>
+                    </div>
+                </li>
+                <li><label for="c1">数据本周</label></li>
+                <li><textarea id="c1" placeholder="1.xxxxxxxxx&#10;2.sssssss"></textarea></li>
+                <li><label for="n1">数据下周</label></li>
+                <li><textarea id="n1" placeholder="1.xxxxxxxxx&#10;2.sssssss"></textarea></li>
+                <li>
+                    <div class="layui-btn-container" style="text-align: right;">
+                         <button class="layui-btn" onclick="subpost(1);">提交</button>
+                     </div>
+                </li>
+                <!---------------------------------------------------------------------------------------->
+                <li>
+                    <div class="layui-progress" style="margin: 15px 0 30px;">
+                        <div class="layui-progress-bar" lay-percent="100%"></div>
+                    </div>
+                </li>
+                <li><label for="c2">移动端本周</label></li>
+                <li><textarea id="c2" placeholder="1.xxxxxxxxx&#10;2.sssssss"></textarea></li>
+                <li><label for="n2">移动端下周</label></li>
+                <li><textarea id="n2" placeholder="1.xxxxxxxxx&#10;2.sssssss"></textarea></li>
+                <li>
+                    <div class="layui-btn-container" style="text-align: right;">
+                        <button class="layui-btn" onclick="subpost(2);">提交</button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </blockquote>
+</div>
+
+
+
+<!-- 引入 js 的 <script> 标签最好放置在 html 末尾 -->
+<script src="./jquery.js"></script>
+<script src="./layui.js"></script>
+<script>
+   $(function (){
+
+
+       $.ajax({
+           url:'/read',
+           dataType:'json',
+           type:'POST',
+           success:function(result){
+
+               for(var k in result){
+                   $("#"+k).val(result[k]);
+               }
+
+           },
+           error: function(XMLHttpRequest, textStatus, errorThrown) {
+               alert(XMLHttpRequest.status);
+               alert(XMLHttpRequest.readyState);
+               alert(textStatus);
+           },
+           complete: function(XMLHttpRequest, textStatus) {
+               this; // 调用本次AJAX请求时传递的options参数
+           }
+       });
+
+       var date = new Date();
+       if($("#sm").val()==''||$("#sd").val()==''||$("#em").val()==''||$("#ed").val()==''){
+           $("#sm").val(date.getMonth() + 1)
+           $("#em").val(date.getMonth() + 1)
+           $("#sd").val(date.getDate()-3)
+           $("#ed").val(date.getDate()+1)
+       }
+   })
+
+    var subdate = function(){
+        if($("#sm").val()==''||$("#sd").val()==''||$("#em").val()==''||$("#ed").val()==''||$("#gs").val()==''){
+            alert('日期，测试点。不能为空')
+            return;
+        }
+        $.ajax({
+            url:'/savedate',
+            data: {sm:$("#sm").val(),sd:$("#sd").val(),em:$("#em").val(),ed:$("#ed").val(),gs:$("#gs").val()},
+            dataType:'json',
+            type:'POST',
+            success:function(result){
+                console.log(result)
+                if(result.code=='0'){
+                    alert('保存成功');
+                }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert(XMLHttpRequest.status);
+                alert(XMLHttpRequest.readyState);
+                alert(textStatus);
+            },
+            complete: function(XMLHttpRequest, textStatus) {
+                this; // 调用本次AJAX请求时传递的options参数
+            }
+        });
+    }
+    var subpost = function(part){
+        var v1=$("#c"+part).val();
+        var v2=$("#n"+part).val();
+        if(v1==''){
+            $("#c"+part).css("border-color","red");
+            alert('请填写本周周报');
+            return;
+        }
+        if(v2==''){
+            $("#n"+part).css("border-color","red");
+            alert('请填写下周周报');
+            return;
+        }
+        $.ajax({
+            url:'/save',
+            data: {t:part,c:v1,n:v2},
+            dataType:'json',
+            type:'POST',
+            success:function(result){
+                console.log(result)
+                if(result.code=='0'){
+                    alert('保存成功');
+                    layer.msg('保存成功')
+                }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert(XMLHttpRequest.status);
+                alert(XMLHttpRequest.readyState);
+                alert(textStatus);
+            },
+            complete: function(XMLHttpRequest, textStatus) {
+                this; // 调用本次AJAX请求时传递的options参数
+            }
+        });
+    }
+   var clear = function () {
+       $.ajax({
+           url:'/clear',
+           dataType:'json',
+           data: {},
+           type:'POST',
+           success:function(result){
+              alert('清除成功，请填写！');
+              location.reload();
+           },
+           error: function(XMLHttpRequest, textStatus, errorThrown) {
+               alert(XMLHttpRequest.status);
+               alert(XMLHttpRequest.readyState);
+               alert(textStatus);
+           },
+           complete: function(XMLHttpRequest, textStatus) {
+               this; // 调用本次AJAX请求时传递的options参数
+           }
+       });
+   }
+</script>
+</body>
+</html>
