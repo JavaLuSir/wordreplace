@@ -1,7 +1,6 @@
 package org.javalu.docgen.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.sun.deploy.net.HttpResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.docx4j.XmlUtils;
 import org.docx4j.jaxb.Context;
@@ -44,6 +43,7 @@ public class DocController {
     @ResponseBody
     @RequestMapping("/save")
     public String save(@RequestParam Map<String,String> data){
+        Map<String,String> rst = new HashMap<>();
         String t = data.get("t");
         String cvalue = data.get("c");
         String nvalue = data.get("n");
@@ -57,8 +57,10 @@ public class DocController {
             PropertyUtil.savemap(data);
         } catch (Exception e) {
             e.printStackTrace();
+            rst.put("code","-1");
+            return JSONObject.toJSONString(rst);
         }
-        Map<String,String> rst = new HashMap<>();
+
         rst.put("code","0");
         return JSONObject.toJSONString(rst);
     }
@@ -68,6 +70,11 @@ public class DocController {
     public String savedate(@RequestParam Map<String,String> data){
 
         try {
+            data.forEach((k,v)->{
+                if(!k.equals("gs")){
+                    data.put(k,String.format("%02d",Integer.parseInt(v)));
+                }
+            });
             PropertyUtil.savemap(data);
         } catch (Exception e) {
             e.printStackTrace();
@@ -101,7 +108,14 @@ public class DocController {
         try {
             fins = new FileInputStream(inputfilepath);
             Map<String, String> mp = PropertyUtil.readmap();
-            Docx4jUtils.downloadDocUseDoc4j(fins,mp,response,"zb");
+            //处理换行
+            mp.forEach((k,v)->{
+                mp.put(k,Docx4jUtils.newlineToBreakHack(v));
+            });
+            StringBuffer filename = new StringBuffer("信息通信工作一周要情");
+            filename.append(DateUtil.getYear()+"0"+mp.get("sm")+mp.get("sd")+"-0"+mp.get("em")+mp.get("ed"));
+
+            Docx4jUtils.downloadDocUseDoc4j(fins,mp,response,filename.toString());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }finally {
@@ -115,7 +129,7 @@ public class DocController {
 
     }
 
-    public void writedoc(Map<String,String> mappings) throws Exception {
+    public static void writedoc(Map<String,String> mappings) throws Exception {
 
             // Exclude context init from timing
             ObjectFactory foo = Context.getWmlObjectFactory();
@@ -148,7 +162,6 @@ public class DocController {
                         true));
             }
     }
-
 
 
 }

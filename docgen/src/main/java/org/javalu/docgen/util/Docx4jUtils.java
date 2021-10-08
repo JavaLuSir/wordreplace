@@ -253,7 +253,7 @@ public final class Docx4jUtils {
      * @param r
      * @return
      */
-    private static String newlineToBreakHack(String r) {
+    public static String newlineToBreakHack(String r) {
 
         StringTokenizer st = new StringTokenizer(r, "\n\r\f"); // tokenize on the newline character, the carriage-return character, and the form-feed character
         StringBuilder sb = new StringBuilder();

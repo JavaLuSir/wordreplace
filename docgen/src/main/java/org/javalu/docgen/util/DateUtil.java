@@ -3,6 +3,7 @@ package org.javalu.docgen.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class DateUtil {
     public static String getUTCTimeStr() {
@@ -31,4 +32,35 @@ public class DateUtil {
         }
         return null ;
     }
+
+    public static String getYear(){
+        // 1、取得本地时间：
+        Calendar cal = Calendar.getInstance() ;
+        int year = cal.get(Calendar.YEAR);
+        return year+"";
+    }
+
+    public static String getMonth(){
+        // 1、取得本地时间：
+        Calendar cal = Calendar.getInstance() ;
+        int month = cal.get(Calendar.MONTH)+1;
+        return String.format("%02d", month);
+    }
+
+    public static String getDay(){
+        // 1、取得本地时间：
+        Calendar cal = Calendar.getInstance() ;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        return String.format("%02d", day);
+    }
+
+    public static String getspDateStr(){
+        // 1、取得本地时间：
+        Calendar cal = Calendar.getInstance() ;
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH)+1;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        return year+String.format("%03d", month)+String.format("%02d", day-3)+"-"+String.format("%03d", month)+String.format("%02d", day+1);
+    }
+
 }

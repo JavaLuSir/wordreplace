@@ -1,5 +1,7 @@
 package org.javalu.docgen.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.*;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -20,7 +22,11 @@ public class PropertyUtil {
         try {
             fins = new BufferedInputStream(new FileInputStream(f));
             p.load(fins);
-            mapdata.forEach((k,v)->{ p.setProperty(k,v);});
+            mapdata.forEach((k,v)->{
+                if(!StringUtils.isEmpty(k)&&!StringUtils.isEmpty(v)){
+                    p.setProperty(k,v);
+                }
+            });
 
             fons = new FileOutputStream(TMPDIR);
             p.store(fons,null);
