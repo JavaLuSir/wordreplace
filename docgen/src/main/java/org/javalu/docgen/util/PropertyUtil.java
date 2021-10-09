@@ -73,6 +73,14 @@ public class PropertyUtil {
     public static Map<String, String> readmap() {
         Map<String, String> resultMap = new HashMap<>();
         File f = new File(TMPDIR);
+        if(!f.isDirectory()&&!f.exists()){
+            try {
+                new File(TMPDIR.substring(0,TMPDIR.lastIndexOf("/"))).mkdirs();
+                f.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         InputStream fins = null;
 
         Properties p = new Properties();
@@ -95,6 +103,5 @@ public class PropertyUtil {
         }
         return resultMap;
     }
-
 
 }
